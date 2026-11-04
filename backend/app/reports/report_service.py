@@ -126,3 +126,4 @@ class ReportService:
         doc.build(story)
 
 report_service = ReportService()
+

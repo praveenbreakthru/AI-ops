@@ -72,3 +72,4 @@ flowchart TD
 | FastAPI Backend | 8000 | 127.0.0.1:8000 | Python Process / Container |
 | React UI | 5173 | 127.0.0.1:5173 | Vite Dev Server / Container |
 | Grafana Alloy | 12345 | 127.0.0.1:12345 | Native Windows Agent |
+

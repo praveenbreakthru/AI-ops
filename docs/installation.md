@@ -80,3 +80,4 @@ To ensure the platform starts automatically after a reboot or user login:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\setup-windows-autostart.ps1
 ```
+

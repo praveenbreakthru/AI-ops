@@ -116,3 +116,4 @@ This guide documents the core PromQL queries configured for the Windows AIOps pl
   ```promql
   (time() - windows_system_boot_time_timestamp) / 86400
   ```
+

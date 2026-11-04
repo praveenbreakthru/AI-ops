@@ -67,3 +67,4 @@ export const NetworkMonitoring: React.FC = () => {
     </div>
   );
 };
+

@@ -92,3 +92,4 @@ export const PredictionsPage: React.FC = () => {
     </div>
   );
 };
+

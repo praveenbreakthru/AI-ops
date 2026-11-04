@@ -161,3 +161,4 @@ Expected output:
 [PASS] FastAPI Backend (8000)  : 200 OK (REST & AI Engine healthy)
 [PASS] React Frontend (5173)   : 200 OK (UI operational)
 ```
+

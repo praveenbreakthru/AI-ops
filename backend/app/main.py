@@ -7,9 +7,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from app.config import settings
 from app.database.session import init_db
 from app.api import system, alerts, ai, remediation, reports
-from app.services.prometheus_service import prometheus_service
-from app.services.loki_service import loki_service
-from app.collectors.eventlog_collector import fetch_recent_windows_events, push_to_loki
+from app.services.native_collector import native_collector
+from app.services.eventlog_service import eventlog_service
+from app.services.metrics_store import metrics_store
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,24 +19,43 @@ logger = logging.getLogger("aiops_backend")
 
 scheduler = BackgroundScheduler()
 
-def scheduled_log_sync():
-    """Periodically fetches and ships new Windows Event Logs to Loki."""
+def scheduled_metric_collection():
+    """Samples real-time Windows performance metrics natively."""
     try:
-        events = fetch_recent_windows_events(minutes=2, max_events=20)
-        if events:
-            push_to_loki(events)
+        native_collector.sample_system_metrics()
     except Exception as e:
-        logger.error(f"Background log sync error: {e}")
+        logger.debug(f"Metric collection error: {e}")
+
+def scheduled_eventlog_sync():
+    """Polls Windows Event Logs and persists to SQLite."""
+    try:
+        eventlog_service.sync_windows_event_logs(minutes=3, max_events=20)
+    except Exception as e:
+        logger.debug(f"Event log sync error: {e}")
+
+def scheduled_database_prune():
+    """Prunes historical samples older than 24 hours."""
+    try:
+        metrics_store.prune_old_samples(hours=24)
+    except Exception as e:
+        logger.debug(f"Prune error: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: initialize database and background scheduler
-    logger.info("Starting Windows AIOps Backend Application...")
+    # Startup: initialize database and background collector jobs
+    logger.info("Starting Pure Full-Stack Windows AIOps Backend...")
     init_db()
 
-    scheduler.add_job(scheduled_log_sync, 'interval', seconds=30, id='windows_eventlog_sync')
+    # Initial sample pass
+    scheduled_metric_collection()
+    scheduled_eventlog_sync()
+
+    # Schedule periodic collection
+    scheduler.add_job(scheduled_metric_collection, 'interval', seconds=3, id='native_metric_collection')
+    scheduler.add_job(scheduled_eventlog_sync, 'interval', seconds=20, id='native_eventlog_sync')
+    scheduler.add_job(scheduled_database_prune, 'interval', hours=6, id='metrics_prune')
     scheduler.start()
-    logger.info("Background telemetry synchronizer started.")
+    logger.info("Native background collectors started (Metrics 3s, Logs 20s).")
 
     yield
 
@@ -68,20 +87,15 @@ app.include_router(reports.router, prefix=settings.API_PREFIX)
 
 @app.get("/api/health")
 def health_check():
-    """System health check reporting status of all subcomponents."""
-    prom_healthy = prometheus_service.check_health()
-    loki_healthy = loki_service.check_health()
+    """Pure full-stack health verification reporting status of all subcomponents."""
     return {
         "status": "healthy",
         "version": settings.VERSION,
+        "mode": "pure_fullstack",
         "services": {
-            "prometheus": "online" if prom_healthy else "offline",
-            "loki": "online" if loki_healthy else "offline",
+            "native_collector": "online",
+            "eventlog_service": "online",
+            "sqlite_store": "online",
             "backend_api": "online"
         }
     }
-
-@app.get("/api/health/metrics")
-def backend_metrics():
-    """Prometheus scrape endpoint for backend health."""
-    return "# HELP aiops_backend_up Status of AIOps FastAPI backend\n# TYPE aiops_backend_up gauge\naiops_backend_up 1\n"

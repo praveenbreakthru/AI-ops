@@ -74,3 +74,4 @@ export const AlertsPage: React.FC = () => {
     </div>
   );
 };
+

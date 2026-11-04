@@ -132,3 +132,4 @@ export const LogsExplorer: React.FC = () => {
     </div>
   );
 };
+

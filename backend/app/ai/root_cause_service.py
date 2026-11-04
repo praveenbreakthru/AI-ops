@@ -1,8 +1,7 @@
 import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
-from app.services.prometheus_service import prometheus_service
-from app.services.loki_service import loki_service
+from app.services.eventlog_service import eventlog_service
 from app.services.system_service import system_service
 
 logger = logging.getLogger(__name__)
@@ -22,16 +21,13 @@ class RootCauseAnalysisService:
         top_proc_names = [f"{p.name} ({p.memory_mb} MB, CPU {p.cpu_percent}%)" for p in procs[:3]]
         evidence.append(f"Top active processes: {', '.join(top_proc_names)}")
 
-        # 2. Query Recent Windows Event Logs from Loki (look for Errors and Warnings in last 15 min)
-        recent_logs = loki_service.query_logs(
-            logql='{job="windows_event_logs"} |= "error" or {job="windows_event_logs"} |= "critical" or {job="windows_event_logs"} |= "warning"',
-            limit=5
-        )
+        # 2. Query Recent Windows Event Logs from SQLite eventlog_service
+        recent_logs = eventlog_service.query_logs(channel="all", limit=5)
 
         log_evidence = []
         for l in recent_logs:
             log_evidence.append(f"EventID {l['event_id']} ({l['provider']}): {l['message'][:120]}...")
-            evidence.append(f"Loki Log: [{l['level'].upper()}] EventID {l['event_id']} ({l['provider']})")
+            evidence.append(f"Windows Event: [{l['level'].upper()}] EventID {l['event_id']} ({l['provider']})")
 
         # 3. Analyze Patterns
         if "CPU" in incident_title or "Spike" in incident_title:
@@ -67,3 +63,4 @@ class RootCauseAnalysisService:
         }
 
 root_cause_service = RootCauseAnalysisService()
+

@@ -77,3 +77,25 @@ class HistoricalReport(Base):
     file_path_pdf = Column(String(512), nullable=True)
     file_path_csv = Column(String(512), nullable=True)
     created_at = Column(DateTime(timezone=True), default=utc_now)
+
+class MetricSample(Base):
+    __tablename__ = "metric_samples"
+
+    id = Column(Integer, primary_key=True, index=True)
+    metric_name = Column(String(64), index=True, nullable=False)
+    timestamp = Column(Float, index=True, nullable=False)
+    value = Column(Float, nullable=False)
+    label = Column(String(64), nullable=True)
+
+class EventLogRecord(Base):
+    __tablename__ = "event_log_records"
+
+    id = Column(Integer, primary_key=True, index=True)
+    channel = Column(String(32), index=True, nullable=False)
+    level = Column(String(32), index=True, nullable=False)
+    provider = Column(String(128), nullable=True)
+    event_id = Column(Integer, default=0)
+    message = Column(Text, nullable=True)
+    timestamp = Column(DateTime(timezone=True), default=utc_now)
+
+

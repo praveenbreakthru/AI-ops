@@ -79,3 +79,4 @@ class DiagnosisService:
         return None
 
 diagnosis_service = DiagnosisService()
+

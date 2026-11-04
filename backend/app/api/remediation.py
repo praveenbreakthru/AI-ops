@@ -26,3 +26,4 @@ def approve_action(action_id: int):
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])
     return result
+

@@ -115,3 +115,4 @@ export interface AiDiagnosisResponse {
   severity_assessment: string;
   provider: string;
 }
+

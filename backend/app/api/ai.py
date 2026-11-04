@@ -22,3 +22,4 @@ def generate_ai_diagnosis(req: AiDiagnosisRequest):
     """Executes root-cause correlation and queries Ollama or grounded statistical AI."""
     title = req.context_notes or "Telemetry Anomaly Evaluation"
     return diagnosis_service.generate_diagnosis(incident_title=title, context_notes=req.context_notes)
+

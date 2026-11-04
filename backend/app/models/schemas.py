@@ -156,3 +156,4 @@ class RemediationActionOut(BaseModel):
     command_executed: Optional[str]
     execution_result: Optional[str]
     created_at: datetime
+

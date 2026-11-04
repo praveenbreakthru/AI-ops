@@ -10,15 +10,27 @@ from app.models.schemas import IncidentOut
 router = APIRouter(tags=["Alerts & Incidents"])
 
 @router.get("/alerts")
-def get_active_alerts():
-    """Queries active firing alerts directly from Alertmanager."""
-    try:
-        resp = requests.get(f"{settings.ALERTMANAGER_URL}/api/v2/alerts", timeout=3)
-        if resp.status_code == 200:
-            return resp.json()
-    except Exception:
-        pass
-    return []
+def get_active_alerts(db: Session = Depends(get_db)):
+    """Queries active firing alerts natively from the local database."""
+    incidents = db.query(Incident).filter(Incident.status == "firing").all()
+    return [
+        {
+            "labels": {
+                "alertname": inc.alert_name,
+                "severity": inc.severity,
+                "instance": inc.instance or "windows-laptop"
+            },
+            "annotations": {
+                "summary": inc.summary,
+                "description": inc.description or ""
+            },
+            "status": {
+                "state": "active"
+            },
+            "startsAt": inc.starts_at.isoformat() if inc.starts_at else None
+        }
+        for inc in incidents
+    ]
 
 @router.get("/incidents", response_model=List[IncidentOut])
 def get_incidents(db: Session = Depends(get_db)):
@@ -66,3 +78,4 @@ async def receive_alertmanager_webhook(request: Request, db: Session = Depends(g
             db.commit()
 
     return {"status": "processed", "count": len(alerts)}
+

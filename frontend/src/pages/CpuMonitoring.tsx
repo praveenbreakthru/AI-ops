@@ -87,3 +87,4 @@ export const CpuMonitoring: React.FC = () => {
     </div>
   );
 };
+

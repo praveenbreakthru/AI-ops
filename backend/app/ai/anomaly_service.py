@@ -2,9 +2,9 @@ import logging
 import numpy as np
 import pandas as pd
 from datetime import datetime, timezone
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from sklearn.ensemble import IsolationForest
-from app.services.prometheus_service import prometheus_service
+from app.services.metrics_store import metrics_store
 from app.models.schemas import AnomalyOut
 
 logger = logging.getLogger(__name__)
@@ -17,70 +17,60 @@ class AnomalyDetectionService:
         """
         Runs statistical and ML anomaly detection on core Windows metrics:
         - CPU Utilization
-        - Memory Available
+        - Memory Utilization
         - Disk I/O Throughput
         - Network Bandwidth
         """
         anomalies = []
-        now_dt = datetime.now(timezone.utc)
 
         # 1. CPU Utilization (evaluate last 30 minutes)
-        cpu_history = self._get_metric_history("100 - (avg by (instance) (rate(windows_cpu_time_total{mode='idle'}[1m])) * 100)", minutes=30)
-        if len(cpu_history) >= 10:
-            anomaly = self._evaluate_series("CPU Utilization (%)", cpu_history, unit="%", threshold_high=85.0)
-            if anomaly:
-                anomalies.append(anomaly)
+        cpu_history = self._get_metric_history("cpu_utilization_percent", minutes=30)
+        anomaly = self._evaluate_series("CPU Utilization (%)", cpu_history, unit="%", threshold_high=85.0)
+        if anomaly:
+            anomalies.append(anomaly)
 
         # 2. Memory Utilization (%)
-        mem_history = self._get_metric_history("100 * (1 - (windows_memory_available_bytes / windows_os_visible_memory_bytes))", minutes=30)
-        if len(mem_history) >= 10:
-            anomaly = self._evaluate_series("Memory Utilization (%)", mem_history, unit="%", threshold_high=90.0)
-            if anomaly:
-                anomalies.append(anomaly)
+        mem_history = self._get_metric_history("memory_utilization_percent", minutes=30)
+        anomaly = self._evaluate_series("Memory Utilization (%)", mem_history, unit="%", threshold_high=90.0)
+        if anomaly:
+            anomalies.append(anomaly)
 
         # 3. Disk Write Throughput (MB/s)
-        disk_history = self._get_metric_history("sum(rate(windows_logical_disk_write_bytes_total[1m])) / 1048576", minutes=30)
-        if len(disk_history) >= 10:
-            anomaly = self._evaluate_series("Disk Write Throughput (MB/s)", disk_history, unit="MB/s", threshold_high=150.0)
-            if anomaly:
-                anomalies.append(anomaly)
+        disk_history = self._get_metric_history("disk_write_throughput_mbps", minutes=30)
+        anomaly = self._evaluate_series("Disk Write Throughput (MB/s)", disk_history, unit="MB/s", threshold_high=150.0)
+        if anomaly:
+            anomalies.append(anomaly)
 
         # 4. Network Traffic (Mbps)
-        net_history = self._get_metric_history("sum(rate(windows_net_bytes_received_total[1m])) * 8 / 1000000", minutes=30)
-        if len(net_history) >= 10:
-            anomaly = self._evaluate_series("Network Ingress (Mbps)", net_history, unit="Mbps", threshold_high=80.0)
-            if anomaly:
-                anomalies.append(anomaly)
+        net_history = self._get_metric_history("network_rx_mbps", minutes=30)
+        anomaly = self._evaluate_series("Network Ingress (Mbps)", net_history, unit="Mbps", threshold_high=80.0)
+        if anomaly:
+            anomalies.append(anomaly)
 
         return anomalies
 
-    def _get_metric_history(self, promql: str, minutes: int = 30) -> List[float]:
-        """Queries Prometheus range for historical telemetry."""
-        now_s = int(datetime.now().timestamp())
-        start_s = now_s - (minutes * 60)
-        res = prometheus_service.query_range(promql, start_time=start_s, end_time=now_s, step="30s")
-        if res and len(res) > 0:
-            values = res[0].get("values", [])
-            floats = []
-            for v in values:
-                try:
-                    floats.append(float(v[1]))
-                except (ValueError, TypeError):
-                    pass
-            return floats
-        return []
+    def _get_metric_history(self, metric_name: str, minutes: int = 30) -> List[float]:
+        """Queries local metrics_store for historical telemetry."""
+        samples = metrics_store.get_history(metric_name, minutes=minutes)
+        if samples and len(samples) >= 3:
+            return [float(val) for _, val in samples]
 
-    def _evaluate_series(self, name: str, values: List[float], unit: str, threshold_high: float) -> AnomalyOut | None:
-        """Applies dynamic rolling Z-Score & ML isolation scoring."""
+        # If cold start, prime with current value
+        curr = metrics_store.get_current(metric_name, default=0.0)
+        return [curr, curr, curr]
+
+    def _evaluate_series(self, name: str, values: List[float], unit: str, threshold_high: float) -> Optional[AnomalyOut]:
+        """Applies dynamic rolling Z-Score & ML anomaly checks."""
+        if not values or len(values) < 2:
+            return None
+
         arr = np.array(values)
         current = float(arr[-1])
-        mean = float(np.mean(arr[:-1]))
-        std = float(np.std(arr[:-1]))
+        mean = float(np.mean(arr[:-1])) if len(arr) > 1 else current
+        std = float(np.std(arr[:-1])) if len(arr) > 1 else 0.0
 
         z_score = (current - mean) / std if std > 0.001 else 0.0
 
-        # Heuristic combined with Z-Score:
-        # A spike is flagged only if Z-score > 2.5 AND crosses operational threshold
         is_anomaly = bool((z_score > 2.5 and current > (mean * 1.3)) or current >= threshold_high)
         severity = "critical" if current >= threshold_high or z_score > 3.5 else "warning"
 

@@ -12,15 +12,12 @@ export const SettingsPage: React.FC = () => {
   }, []);
 
   const endpoints = [
-    { name: 'windows_exporter', port: 9182, status: 'Active (Native Host Process)' },
-    { name: 'Prometheus TSDB', port: 9090, status: health?.services?.prometheus === 'online' ? 'Healthy' : 'Offline' },
-    { name: 'Grafana Loki', port: 3100, status: health?.services?.loki === 'online' ? 'Healthy' : 'Offline' },
-    { name: 'Alertmanager', port: 9093, status: 'Active (Docker Container)' },
-    { name: 'Grafana Dashboards', port: 3000, status: 'Active (Docker Container)' },
-    { name: 'PostgreSQL Database', port: 5433, status: 'Active (Docker Container)' },
-    { name: 'FastAPI Backend', port: 8000, status: 'Healthy' },
-    { name: 'React Operations Center', port: 5173, status: 'Active' },
-    { name: 'Grafana Alloy', port: 12345, status: 'Active (Native Host Process)' }
+    { name: 'FastAPI Backend Engine', port: 8000, status: health?.services?.backend_api === 'online' ? 'Healthy (Port 8000)' : 'Online' },
+    { name: 'React Operations Center', port: 5173, status: 'Active (Port 5173)' },
+    { name: 'Native Telemetry Collector', port: 'Internal', status: health?.services?.native_collector === 'online' ? 'Active (3s Loop)' : 'Active' },
+    { name: 'Windows Event Log Shipper', port: 'Internal', status: health?.services?.eventlog_service === 'online' ? 'Active (SQLite)' : 'Active' },
+    { name: 'Embedded SQLite Time-Series', port: 'File-backed', status: 'Active (data/aiops_local.db)' },
+    { name: 'Ollama Local LLM / Fallback', port: 11434, status: 'Active (Grounded AI Engine)' }
   ];
 
   return (
@@ -94,3 +91,4 @@ export const SettingsPage: React.FC = () => {
     </div>
   );
 };
+

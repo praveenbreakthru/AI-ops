@@ -1,21 +1,19 @@
 <#
 .SYNOPSIS
-    Comprehensive Health Check for Windows AIOps Platform.
+    Health Verification for Pure Full-Stack Windows AIOps Platform.
 #>
 
 $services = @(
-    @{ Name = "windows_exporter"; Url = "http://127.0.0.1:9182/metrics"; ExpectedCode = 200 },
-    @{ Name = "Prometheus TSDB"; Url = "http://127.0.0.1:9090/-/healthy"; ExpectedCode = 200 },
-    @{ Name = "Grafana Dashboards"; Url = "http://127.0.0.1:3000/api/health"; ExpectedCode = 200 },
-    @{ Name = "Grafana Loki"; Url = "http://127.0.0.1:3100/ready"; ExpectedCode = 200 },
-    @{ Name = "Alertmanager"; Url = "http://127.0.0.1:9093/-/healthy"; ExpectedCode = 200 },
-    @{ Name = "FastAPI Backend"; Url = "http://127.0.0.1:8000/api/health"; ExpectedCode = 200 },
-    @{ Name = "React Frontend"; Url = "http://127.0.0.1:5173"; ExpectedCode = 200 },
-    @{ Name = "Grafana Alloy"; Url = "http://127.0.0.1:12345/-/ready"; ExpectedCode = 200 }
+    @{ Name = "FastAPI Backend API";   Url = "http://127.0.0.1:8000/api/health";          ExpectedCode = 200 },
+    @{ Name = "React Operations UI";   Url = "http://127.0.0.1:5173";                     ExpectedCode = 200 },
+    @{ Name = "Live Telemetry Gauges"; Url = "http://127.0.0.1:8000/api/system/overview"; ExpectedCode = 200 },
+    @{ Name = "Windows Event Logs";    Url = "http://127.0.0.1:8000/api/system/logs";     ExpectedCode = 200 },
+    @{ Name = "AI Predictive Engine";  Url = "http://127.0.0.1:8000/api/ai/predictions";  ExpectedCode = 200 }
 )
 
 Write-Host "`n========================================================" -ForegroundColor Cyan
 Write-Host "       WINDOWS AIOPS PLATFORM HEALTH VERIFICATION       " -ForegroundColor Cyan
+Write-Host "       (Pure Full-Stack: Python Backend + React UI)     " -ForegroundColor Cyan
 Write-Host "========================================================`n" -ForegroundColor Cyan
 
 $passed = 0
@@ -23,8 +21,8 @@ $total = $services.Count
 
 foreach ($s in $services) {
     try {
-        $resp = Invoke-WebRequest -Uri $s.Url -UseBasicParsing -TimeoutSec 6 -ErrorAction Stop
-        if ($resp.StatusCode -eq $s.ExpectedCode -or ($s.Name -eq "Grafana Loki" -and $resp.StatusCode -in 200, 503)) {
+        $resp = Invoke-WebRequest -Uri $s.Url -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop
+        if ($resp.StatusCode -eq $s.ExpectedCode) {
             Write-Host "[ PASS ] $($s.Name) is healthy ($($s.Url))" -ForegroundColor Green
             $passed++
         } else {
@@ -35,4 +33,4 @@ foreach ($s in $services) {
     }
 }
 
-Write-Host "`nSummary: $passed / $total monitoring components verified operational.`n" -ForegroundColor Cyan
+Write-Host "`nSummary: $passed / $total core subsystems verified operational.`n" -ForegroundColor Cyan

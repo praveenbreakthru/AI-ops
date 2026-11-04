@@ -21,15 +21,9 @@ class Settings:
     WINDOWS_EXPORTER_URL: str = os.getenv("WINDOWS_EXPORTER_URL", "http://localhost:9182")
     ALLOY_URL: str = os.getenv("ALLOY_URL", "http://localhost:12345")
 
-    # PostgreSQL Database URL with psycopg2 driver
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        "postgresql+psycopg2://aiops:aiops_secure_local_dev@localhost:5433/aiops_platform"
-    )
-    if DATABASE_URL.startswith("postgresql://"):
-        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
-
-    SQLITE_FALLBACK_URL: str = f"sqlite:///{sqlite_file.as_posix()}"
+    # Primary SQLite Database for pure full-stack lightweight deployment
+    DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{sqlite_file.as_posix()}")
+    SQLITE_URL: str = f"sqlite:///{sqlite_file.as_posix()}"
 
     OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
     OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3.2")

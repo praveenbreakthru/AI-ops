@@ -37,3 +37,4 @@
 - **Root Cause Cross-Correlation**: Spikes trigger cross-correlation between Prometheus metric time boundaries and Loki log events.
 - **LLM Integration**: Connects to local Ollama on port `11434` with `llama3.2`. If Ollama is offline, seamlessly activates deterministic grounded reasoning.
 - **Controlled Remediation**: Safelisted Windows services (`Spooler`, `W32Time`, `LanmanWorkstation`) and approved `%TEMP%` cleanup under manual operator approval.
+

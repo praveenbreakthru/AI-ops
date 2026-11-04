@@ -80,3 +80,4 @@ export const DiskMonitoring: React.FC = () => {
     </div>
   );
 };
+

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 from typing import List, Dict, Any
 from app.services.system_service import system_service
-from app.services.loki_service import loki_service
+from app.services.eventlog_service import eventlog_service
 from app.models.schemas import (
     SystemOverview, CpuMetrics, MemoryMetrics,
     DiskVolumeInfo, ProcessSummary, ServiceSummary, LogEntry
@@ -44,8 +44,5 @@ def get_services(limit: int = Query(30, ge=1, le=100)):
 
 @router.get("/logs", response_model=List[LogEntry])
 def get_logs(channel: str = Query("all"), limit: int = Query(50, ge=1, le=200)):
-    if channel != "all":
-        query = f'{{job="windows_event_logs", channel="{channel}"}}'
-    else:
-        query = '{job="windows_event_logs"}'
-    return loki_service.query_logs(logql=query, limit=limit)
+    return eventlog_service.query_logs(channel=channel, limit=limit)
+

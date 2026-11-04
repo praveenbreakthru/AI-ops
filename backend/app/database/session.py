@@ -7,46 +7,25 @@ from app.database.models import Base
 
 logger = logging.getLogger(__name__)
 
-engine = None
-SessionLocal = None
+sqlite_url = settings.DATABASE_URL
+if not sqlite_url.startswith("sqlite"):
+    sqlite_url = settings.SQLITE_URL
 
-def get_engine():
-    global engine
-    if engine is not None:
-        return engine
-
-    try:
-        # Attempt PostgreSQL connection
-        pg_engine = create_engine(
-            settings.DATABASE_URL,
-            pool_pre_ping=True,
-            pool_size=5,
-            max_overflow=10,
-            connect_args={"connect_timeout": 3}
-        )
-        with pg_engine.connect() as conn:
-            logger.info("Successfully connected to PostgreSQL at port 5433.")
-        engine = pg_engine
-    except Exception as e:
-        logger.warning(f"Could not connect to PostgreSQL ({e}). Falling back to SQLite.")
-        sqlite_engine = create_engine(
-            settings.SQLITE_FALLBACK_URL,
-            connect_args={"check_same_thread": False}
-        )
-        engine = sqlite_engine
-
-    return engine
+engine = create_engine(
+    sqlite_url,
+    connect_args={"check_same_thread": False}
+)
+Base.metadata.create_all(bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+logger.info(f"Initialized database engine and schemas: {sqlite_url}")
 
 def init_db():
-    global SessionLocal
-    eng = get_engine()
-    Base.metadata.create_all(bind=eng)
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=eng)
-    logger.info("Database schemas initialized.")
+    Base.metadata.create_all(bind=engine)
+
+def get_session():
+    return SessionLocal()
 
 def get_db():
-    if SessionLocal is None:
-        init_db()
     db = SessionLocal()
     try:
         yield db
