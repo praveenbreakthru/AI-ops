@@ -1,0 +1,17 @@
+# HELP windows_hardware_battery_percent Current battery charge percentage
+# TYPE windows_hardware_battery_percent gauge
+windows_hardware_battery_percent{device="01AV465"} 89
+
+# HELP windows_hardware_battery_runtime_minutes Estimated remaining battery runtime in minutes
+# TYPE windows_hardware_battery_runtime_minutes gauge
+windows_hardware_battery_runtime_minutes{device="01AV465"} 297
+
+# HELP windows_hardware_gpu_info Detected GPU device information
+# TYPE windows_hardware_gpu_info gauge
+windows_hardware_gpu_info{name="Intel(R) UHD Graphics 620"} 1
+
+# HELP windows_hardware_sensor_supported Hardware sensor availability flag (1=supported, 0=unsupported)
+# TYPE windows_hardware_sensor_supported gauge
+windows_hardware_sensor_supported{sensor="battery"} 1
+windows_hardware_sensor_supported{sensor="gpu"} 1
+windows_hardware_sensor_supported{sensor="thermal_zone"} 0

@@ -1,0 +1,24 @@
+ts=2026-11-04T10:04:22.9815783Z level=info msg="Alloy is starting"
+ts=2026-11-04T10:04:22.9815783Z level=info msg="boringcrypto enabled" enabled=false
+ts=2026-11-04T10:04:22.9815783Z level=info msg="no peer discovery configured: both join and discover peers are empty" service=cluster
+ts=2026-11-04T10:04:22.9825857Z level=info msg="running usage stats reporter"
+ts=2026-11-04T10:04:22.9825857Z level=info msg="starting complete graph evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3
+ts=2026-11-04T10:04:22.9845262Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=loki.write.local_loki duration=1.9405ms
+ts=2026-11-04T10:04:22.9893355Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=loki.source.windowsevent.application duration=4.8093ms
+ts=2026-11-04T10:04:22.9921501Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=loki.source.windowsevent.system duration=2.8146ms
+ts=2026-11-04T10:04:22.9921501Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=tracing duration=0s
+ts=2026-11-04T10:04:22.9921501Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=otel duration=0s
+ts=2026-11-04T10:04:22.9921501Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=livedebugging duration=0s
+ts=2026-11-04T10:04:22.9921501Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=labelstore duration=0s
+ts=2026-11-04T10:04:22.9941691Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=logging duration=2.019ms
+ts=2026-11-04T10:04:22.9941691Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=remotecfg duration=0s
+ts=2026-11-04T10:04:22.9951883Z level=info msg="applying non-TLS config to HTTP server" service=http
+ts=2026-11-04T10:04:22.9951883Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=http duration=0s
+ts=2026-11-04T10:04:22.9951883Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=cluster duration=0s
+ts=2026-11-04T10:04:22.9951883Z level=info msg="finished node evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 node_id=ui duration=0s
+ts=2026-11-04T10:04:22.9951883Z level=info msg="finished complete graph evaluation" controller_path=/ controller_id="" trace_id=45b524f334603a9f04cc7a0a7832c1f3 duration=12.6026ms
+ts=2026-11-04T10:04:22.9962968Z level=info msg="scheduling loaded components and services" controller_id=""
+ts=2026-11-04T10:04:22.9962968Z level=info msg="{^_^} Alloy is running"
+ts=2026-11-04T10:04:22.9962968Z level=info msg="starting cluster node" service=cluster peers_count=0 peers="" advertise_addr=127.0.0.1:12345 minimum_cluster_size=0 minimum_size_wait_timeout=0s
+ts=2026-11-04T10:04:22.9972931Z level=info msg="peers changed" service=cluster peers_count=1 min_cluster_size=0 peers=DESKTOP-BJOL5Q5
+ts=2026-11-04T10:04:22.9993588Z level=info msg="now listening for http traffic" service=http addr=127.0.0.1:12345

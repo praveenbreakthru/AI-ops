@@ -1,0 +1,19 @@
+# ==============================================================================
+# Windows Exporter Configuration for Windows AIOps Platform
+# ==============================================================================
+
+collectors:
+  enabled: cpu,logical_disk,memory,net,os,physical_disk,process,service,system,tcp,textfile
+
+collector:
+  textfile:
+    directories: "D:\\Breakthru All Files\\AIops-project\\monitoring\\windows_exporter\\textfile_inputs"
+  process:
+    include: ".+"
+  service:
+    include: ".+"
+    start-mode-include: "auto,boot,manual,disabled,system"
+
+log:
+  level: info
+  format: logfmt
