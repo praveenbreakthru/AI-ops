@@ -2,13 +2,14 @@
 .SYNOPSIS
     Starts the FastAPI AIOps Backend in background with persistent logging.
 #>
+$baseDir = if ($PSScriptRoot) { Split-Path -Parent $PSScriptRoot } else { (Get-Location).Path }
 param(
     [int]$Port = 8000,
-    [string]$LogPath = "D:\Breakthru All Files\AIops-project\logs\backend.log"
+    [string]$LogPath = "$baseDir\logs\backend.log"
 )
 
-$backendDir = "D:\Breakthru All Files\AIops-project\backend"
-New-Item -ItemType Directory -Path "D:\Breakthru All Files\AIops-project\logs" -Force -ErrorAction SilentlyContinue | Out-Null
+$backendDir = "$baseDir\backend"
+New-Item -ItemType Directory -Path "$baseDir\logs" -Force -ErrorAction SilentlyContinue | Out-Null
 
 $existing = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
 if ($existing) {

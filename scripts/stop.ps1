@@ -3,7 +3,7 @@
     Master shutdown script for the complete Windows AIOps Platform.
 #>
 
-$root = "D:\Breakthru All Files\AIops-project"
+$root = if ($PSScriptRoot) { Split-Path -Parent $PSScriptRoot } else { (Get-Location).Path }
 Set-Location $root
 
 Write-Host "`n========================================================" -ForegroundColor Cyan
@@ -39,3 +39,4 @@ Write-Host "[5/5] Stopping windows_exporter..." -ForegroundColor Yellow
 & "$root\scripts\stop-windows-exporter.ps1"
 
 Write-Host "`nAll Windows AIOps services successfully stopped.`n" -ForegroundColor Green
+

@@ -12,3 +12,4 @@ if ($procs) {
 } else {
     Write-Host "Alloy is not running."
 }
+

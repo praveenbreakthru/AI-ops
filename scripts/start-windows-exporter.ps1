@@ -2,10 +2,11 @@
 .SYNOPSIS
     Starts windows_exporter in background with persistent logging.
 #>
+$baseDir = if ($PSScriptRoot) { Split-Path -Parent $PSScriptRoot } else { (Get-Location).Path }
 param(
-    [string]$ConfigPath = "D:\Breakthru All Files\AIops-project\monitoring\windows_exporter\config.yml",
-    [string]$BinaryPath = "D:\Breakthru All Files\AIops-project\monitoring\windows_exporter\windows_exporter.exe",
-    [string]$LogPath    = "D:\Breakthru All Files\AIops-project\monitoring\windows_exporter\windows_exporter.log",
+    [string]$ConfigPath = "$baseDir\monitoring\windows_exporter\config.yml",
+    [string]$BinaryPath = "$baseDir\monitoring\windows_exporter\windows_exporter.exe",
+    [string]$LogPath    = "$baseDir\monitoring\windows_exporter\windows_exporter.log",
     [int]$Port = 9182
 )
 

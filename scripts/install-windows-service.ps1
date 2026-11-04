@@ -24,3 +24,4 @@ $binPathWithArgs = "`"$binary`" --config.file=`"$config`" --web.listen-address=:
 New-Service -Name $serviceName -BinaryPathName $binPathWithArgs -DisplayName "Windows AIOps Exporter" -StartupType Automatic -Description "Prometheus metrics exporter for Windows laptop monitoring"
 Start-Service -Name $serviceName
 Write-Host "windows_exporter successfully registered and started as a Windows Service!"
+

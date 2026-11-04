@@ -12,3 +12,4 @@ if ($procs) {
 } else {
     Write-Host "windows_exporter is not running."
 }
+

@@ -2,7 +2,7 @@
 .SYNOPSIS
     Registers a Windows Scheduled Task to auto-start the Windows AIOps Platform on boot / logon.
 #>
-$root = "D:\Breakthru All Files\AIops-project"
+$root = if ($PSScriptRoot) { Split-Path -Parent $PSScriptRoot } else { (Get-Location).Path }
 $taskName = "WindowsAIOpsPlatformAutoStart"
 $scriptPath = "$root\scripts\start.ps1"
 
@@ -32,3 +32,4 @@ try {
     $shortcut.Save()
     Write-Host "[ SUCCESS ] Fallback Startup shortcut created at '$shortcutPath'." -ForegroundColor Green
 }
+

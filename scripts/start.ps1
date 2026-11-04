@@ -3,7 +3,7 @@
     Master startup script for the complete Windows AIOps Platform.
 #>
 
-$root = "D:\Breakthru All Files\AIops-project"
+$root = if ($PSScriptRoot) { Split-Path -Parent $PSScriptRoot } else { (Get-Location).Path }
 Set-Location $root
 
 Write-Host "`n========================================================" -ForegroundColor Cyan
@@ -40,3 +40,4 @@ if (-not $frontendRunning) {
 # 6. Run Health Verification
 Start-Sleep -Seconds 3
 & "$root\scripts\health-check.ps1"
+

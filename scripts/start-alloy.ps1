@@ -2,10 +2,11 @@
 .SYNOPSIS
     Starts Grafana Alloy for Windows Event Log shipping to Loki.
 #>
+$baseDir = if ($PSScriptRoot) { Split-Path -Parent $PSScriptRoot } else { (Get-Location).Path }
 param(
-    [string]$ConfigPath = "D:\Breakthru All Files\AIops-project\monitoring\alloy\config.alloy",
-    [string]$BinaryPath = "D:\Breakthru All Files\AIops-project\monitoring\alloy\alloy-windows-amd64.exe",
-    [string]$LogPath    = "D:\Breakthru All Files\AIops-project\monitoring\alloy\alloy.log"
+    [string]$ConfigPath = "$baseDir\monitoring\alloy\config.alloy",
+    [string]$BinaryPath = "$baseDir\monitoring\alloy\alloy-windows-amd64.exe",
+    [string]$LogPath    = "$baseDir\monitoring\alloy\alloy.log"
 )
 
 $existing = Get-Process | Where-Object { $_.ProcessName -like "*alloy*" }
@@ -20,7 +21,7 @@ if (-not (Test-Path $BinaryPath)) {
 }
 
 Write-Host "Starting Grafana Alloy..."
-$storagePath = "D:\Breakthru All Files\AIops-project\monitoring\alloy\data"
+$storagePath = "$baseDir\monitoring\alloy\data"
 if (-not (Test-Path $storagePath)) { New-Item -ItemType Directory -Path $storagePath -Force | Out-Null }
 
 $p = Start-Process -FilePath $BinaryPath `
@@ -37,3 +38,4 @@ if (Get-Process -Id $p.Id -ErrorAction SilentlyContinue) {
     Write-Error "Failed to start Grafana Alloy. Check log at $LogPath.err"
     if (Test-Path "$LogPath.err") { Get-Content "$LogPath.err" -Tail 15 }
 }
+
