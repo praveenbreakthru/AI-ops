@@ -156,3 +156,4 @@ class NativeCollector:
             logger.debug(f"Alert evaluation error: {e}")
 
 native_collector = NativeCollector()
+

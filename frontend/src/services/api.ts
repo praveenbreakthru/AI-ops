@@ -107,6 +107,105 @@ export const api = {
       method: 'POST'
     });
     return res.json();
+  },
+
+  // --- Docker & Container Infrastructure ---
+  async getDockerOverview(): Promise<any> {
+    const res = await fetch(`${API_BASE}/apps/docker/overview`);
+    return res.json();
+  },
+
+  async getDockerContainers(all = true): Promise<any[]> {
+    const res = await fetch(`${API_BASE}/apps/docker/containers?all=${all}`);
+    return res.json();
+  },
+
+  async getDockerImages(): Promise<any[]> {
+    const res = await fetch(`${API_BASE}/apps/docker/images`);
+    return res.json();
+  },
+
+  async getContainerLogs(containerId: string): Promise<{ logs: string }> {
+    const res = await fetch(`${API_BASE}/apps/docker/containers/${containerId}/logs`);
+    return res.json();
+  },
+
+  async restartDockerContainer(containerId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/apps/docker/containers/${containerId}/restart`, {
+      method: 'POST'
+    });
+    return res.json();
+  },
+
+  async stopDockerContainer(containerId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/apps/docker/containers/${containerId}/stop`, {
+      method: 'POST'
+    });
+    return res.json();
+  },
+
+  async pruneDockerImages(): Promise<any> {
+    const res = await fetch(`${API_BASE}/apps/docker/prune`, {
+      method: 'POST'
+    });
+    return res.json();
+  },
+
+  async launchDockerDesktop(): Promise<any> {
+    const res = await fetch(`${API_BASE}/apps/docker/launch`, {
+      method: 'POST'
+    });
+    return res.json();
+  },
+
+  // --- Kubernetes ---
+  async getK8sOverview(): Promise<any> {
+    const res = await fetch(`${API_BASE}/apps/k8s/overview`);
+    return res.json();
+  },
+
+  async getK8sPods(namespace = 'all'): Promise<any[]> {
+    const res = await fetch(`${API_BASE}/apps/k8s/pods?namespace=${namespace}`);
+    return res.json();
+  },
+
+  async restartK8sPod(podName: string, namespace = 'default'): Promise<any> {
+    const res = await fetch(`${API_BASE}/apps/k8s/pods/restart`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pod_name: podName, namespace })
+    });
+    return res.json();
+  },
+
+  // --- Application Ecosystem ---
+  async getAppsOverview(): Promise<any[]> {
+    const res = await fetch(`${API_BASE}/apps/overview`);
+    return res.json();
+  },
+
+  // --- Autonomous Self-Healing ---
+  async getAutoHealStatus(): Promise<any> {
+    const res = await fetch(`${API_BASE}/apps/autoheal/status`);
+    return res.json();
+  },
+
+  async setAutoHealMode(mode: 'automatic' | 'manual_approval'): Promise<any> {
+    const res = await fetch(`${API_BASE}/apps/autoheal/mode`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode })
+    });
+    return res.json();
+  },
+
+  async triggerAutoHeal(actionType: string, target: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/apps/autoheal/trigger`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action_type: actionType, target })
+    });
+    return res.json();
   }
 };
 

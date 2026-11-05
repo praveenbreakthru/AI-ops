@@ -2,11 +2,15 @@
 .SYNOPSIS
     Starts the FastAPI AIOps Backend in background with persistent logging.
 #>
-$baseDir = if ($PSScriptRoot) { Split-Path -Parent $PSScriptRoot } else { (Get-Location).Path }
 param(
     [int]$Port = 8000,
-    [string]$LogPath = "$baseDir\logs\backend.log"
+    [string]$LogPath = ""
 )
+
+$baseDir = if ($PSScriptRoot) { Split-Path -Parent $PSScriptRoot } else { (Get-Location).Path }
+if (-not $LogPath) {
+    $LogPath = "$baseDir\logs\backend.log"
+}
 
 $backendDir = "$baseDir\backend"
 New-Item -ItemType Directory -Path "$baseDir\logs" -Force -ErrorAction SilentlyContinue | Out-Null
@@ -18,18 +22,22 @@ if ($existing) {
 }
 
 Write-Host "Starting AIOps FastAPI Backend on port $Port..."
-$p = Start-Process -FilePath "python" `
-    -ArgumentList "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "$Port" `
-    -WorkingDirectory $backendDir `
-    -RedirectStandardOutput $LogPath `
-    -RedirectStandardError "$LogPath.err" `
-    -PassThru -WindowStyle Hidden
+Start-Process -FilePath "cmd.exe" `
+    -ArgumentList "/c", "cd /d `"$backendDir`" && python -m uvicorn app.main:app --host 0.0.0.0 --port $Port >> `"$LogPath`" 2>&1" `
+    -WindowStyle Hidden
 
 Start-Sleep -Seconds 3
 
-if (Get-Process -Id $p.Id -ErrorAction SilentlyContinue) {
-    Write-Host "FastAPI Backend started successfully with PID $($p.Id)."
+$conn = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
+if ($conn) {
+    Write-Host "FastAPI Backend started successfully on port $Port (PID $($conn.OwningProcess))."
 } else {
-    Write-Error "Failed to start FastAPI Backend."
-    if (Test-Path "$LogPath.err") { Get-Content "$LogPath.err" -Tail 15 }
+    Write-Host "Verifying backend startup..."
+    Start-Sleep -Seconds 2
+    $conn = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
+    if ($conn) {
+        Write-Host "FastAPI Backend started successfully on port $Port (PID $($conn.OwningProcess))."
+    } else {
+        Write-Warning "Backend may still be initializing. Check log at $LogPath"
+    }
 }

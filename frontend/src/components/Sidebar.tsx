@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Cpu, HardDrive, Network,
   Layers, Terminal, AlertTriangle, ShieldCheck,
   BrainCircuit, LineChart, FileText, Settings,
-  Activity, MemoryStick
+  Activity, MemoryStick, Boxes
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -15,6 +15,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab, activeAlerts }) => {
   const navItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { id: 'apps_containers', label: 'Docker & Apps', icon: Boxes },
     { id: 'cpu', label: 'CPU Monitoring', icon: Cpu },
     { id: 'memory', label: 'Memory & Swap', icon: MemoryStick },
     { id: 'disk', label: 'Disk & Storage', icon: HardDrive },

@@ -4,11 +4,13 @@
 #>
 
 $services = @(
-    @{ Name = "FastAPI Backend API";   Url = "http://127.0.0.1:8000/api/health";          ExpectedCode = 200 },
-    @{ Name = "React Operations UI";   Url = "http://127.0.0.1:5173";                     ExpectedCode = 200 },
-    @{ Name = "Live Telemetry Gauges"; Url = "http://127.0.0.1:8000/api/system/overview"; ExpectedCode = 200 },
-    @{ Name = "Windows Event Logs";    Url = "http://127.0.0.1:8000/api/system/logs";     ExpectedCode = 200 },
-    @{ Name = "AI Predictive Engine";  Url = "http://127.0.0.1:8000/api/ai/predictions";  ExpectedCode = 200 }
+    @{ Name = "FastAPI Backend API";     Url = "http://127.0.0.1:8000/api/health";            ExpectedCode = 200 },
+    @{ Name = "React Operations UI";     Url = "http://127.0.0.1:5173";                       ExpectedCode = 200 },
+    @{ Name = "Live Telemetry Gauges";   Url = "http://127.0.0.1:8000/api/system/overview";   ExpectedCode = 200 },
+    @{ Name = "Windows Event Logs";      Url = "http://127.0.0.1:8000/api/system/logs";       ExpectedCode = 200 },
+    @{ Name = "AI Predictive Engine";    Url = "http://127.0.0.1:8000/api/ai/predictions";    ExpectedCode = 200 },
+    @{ Name = "Docker & App Ecosystem";  Url = "http://127.0.0.1:8000/api/apps/docker/overview"; ExpectedCode = 200 },
+    @{ Name = "Auto-Healing Engine";     Url = "http://127.0.0.1:8000/api/apps/autoheal/status";  ExpectedCode = 200 }
 )
 
 Write-Host "`n========================================================" -ForegroundColor Cyan

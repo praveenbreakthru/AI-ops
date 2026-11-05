@@ -119,3 +119,4 @@ class MetricsStore:
             logger.warning(f"Error pruning metric samples: {e}")
 
 metrics_store = MetricsStore()
+

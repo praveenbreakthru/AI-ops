@@ -15,6 +15,7 @@ import { AiInsights } from './pages/AiInsights';
 import { PredictionsPage } from './pages/PredictionsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { AppsContainersPage } from './pages/AppsContainersPage';
 import { SystemOverview } from './types';
 import { api } from './services/api';
 
@@ -54,6 +55,8 @@ export function App() {
     switch (currentTab) {
       case 'overview':
         return <Overview overview={overview} />;
+      case 'apps_containers':
+        return <AppsContainersPage />;
       case 'cpu':
         return <CpuMonitoring />;
       case 'memory':
