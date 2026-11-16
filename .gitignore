@@ -1,0 +1,36 @@
+# Environment & Secrets
+.env
+*.local
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Monitoring & Storage runtime data (Docker volumes)
+data/
+monitoring/prometheus/data/
+monitoring/loki/data/
+monitoring/grafana/data/
+
+# Binaries (downloaded locally for Windows)
+monitoring/windows_exporter/*.exe
+monitoring/alloy/*.exe
+monitoring/alloy/*.zip
+
+# IDE & OS
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+

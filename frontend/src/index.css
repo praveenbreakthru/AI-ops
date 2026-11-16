@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    min-height: 100vh;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  /* Dark Theme */
+  body.dark, html.dark body {
+    background-color: #090c15;
+    color: #f8fafc;
+    background-image: 
+      radial-gradient(ellipse 90% 60% at 50% -20%, rgba(139, 92, 246, 0.18), transparent 75%),
+      radial-gradient(ellipse 60% 40% at 100% 20%, rgba(217, 70, 239, 0.12), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 0% 50%, rgba(6, 182, 212, 0.12), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  /* Light Theme */
+  body.light, html.light body {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    background-image: 
+      radial-gradient(ellipse 90% 50% at 50% -15%, rgba(139, 92, 246, 0.08), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 100% 20%, rgba(217, 70, 239, 0.05), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 0% 40%, rgba(6, 182, 212, 0.06), transparent 60%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  /* Luminous Precision Glass Cards - Dark Mode */
+  body.dark .aiops-card {
+    background-color: rgba(15, 19, 34, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    color: #f8fafc;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  body.dark .aiops-card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  /* Crisp Modern Glass Cards - Light Mode */
+  body.light .aiops-card {
+    background-color: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+    color: #0f172a;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  body.light .aiops-card:hover {
+    border-color: rgba(148, 163, 184, 0.6);
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.09), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
+  }
+
+  /* Triple Color Gradient Badges & Buttons */
+  .gradient-triple-violet {
+    background-image: linear-gradient(to right, #8b5cf6, #d946ef, #06b6d4);
+  }
+  .gradient-triple-sunset {
+    background-image: linear-gradient(to right, #f43f5e, #f59e0b, #10b981);
+  }
+  .gradient-triple-aurora {
+    background-image: linear-gradient(to right, #10b981, #06b6d4, #8b5cf6);
+  }
+  .gradient-triple-solar {
+    background-image: linear-gradient(to right, #f97316, #f59e0b, #eab308);
+  }
+}
+
+/* =========================================================================
+   LIGHT MODE COMPONENT CONTRAST ADAPTATIONS
+   Ensure zero white-on-white text, dark-block blotches, or invisible headers
+   ========================================================================= */
+body.light .aiops-card h1,
+body.light .aiops-card h2,
+body.light .aiops-card h3,
+body.light .aiops-card h4,
+body.light .aiops-card .text-white,
+body.light h1.text-white,
+body.light h2.text-white,
+body.light h3.text-white {
+  color: #0f172a !important;
+}
+
+body.light .aiops-card .text-slate-100,
+body.light .aiops-card .text-slate-200,
+body.light .aiops-card .text-slate-300 {
+  color: #1e293b !important;
+}
+
+body.light .aiops-card .text-slate-400 {
+  color: #475569 !important;
+}
+
+/* Sub-card mini boxes (e.g. Read/Write rate, Uptime box, Status badge) in light mode */
+body.light .aiops-card .bg-obsidian-950,
+body.light .aiops-card .bg-obsidian-950\/60,
+body.light .aiops-card .bg-obsidian-950\/70,
+body.light .aiops-card .bg-obsidian-950\/80,
+body.light .aiops-card .bg-obsidian-950\/90,
+body.light .aiops-card .bg-obsidian-900,
+body.light .aiops-card .bg-obsidian-900\/60,
+body.light .aiops-card .bg-obsidian-900\/80,
+body.light .aiops-card .bg-obsidian-850 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Progress bar tracks in light mode */
+body.light .aiops-card .bg-obsidian-950.rounded-full,
+body.light .aiops-card div[class*="bg-obsidian-950"].rounded-full {
+  background-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* White border overrides in light mode */
+body.light .aiops-card div[class*="border-white"] {
+  border-color: #e2e8f0 !important;
+}
+
+/* Tables in light mode */
+body.light table thead {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border-color: #e2e8f0 !important;
+}
+body.light table tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+body.light table tbody td {
+  border-color: #f1f5f9 !important;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.55);
+}
