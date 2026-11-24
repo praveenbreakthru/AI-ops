@@ -131,6 +131,8 @@ class DockerService:
                         except Exception:
                             exit_code = 1
 
+                    is_new = any(kw in status_text.lower() for kw in ["second", "minute", "less than"])
+
                     containers.append({
                         "id": c.get("ID", "")[:12],
                         "name": c.get("Names", "unnamed").lstrip("/"),
@@ -142,7 +144,8 @@ class DockerService:
                         "health": health,
                         "exit_code": exit_code,
                         "ports": c.get("Ports", ""),
-                        "is_crashed": state == "exited" and exit_code != 0
+                        "is_crashed": state == "exited" and exit_code != 0,
+                        "is_new": is_new
                     })
                 except Exception:
                     pass
@@ -254,6 +257,40 @@ class DockerService:
         except Exception as e:
             return {"success": False, "container_id": container_id, "message": str(e)}
 
+    def delete_container(self, container_id: str, force: bool = True) -> Dict[str, Any]:
+        """Deletes/removes a container."""
+        try:
+            cmd = ["docker", "rm"]
+            if force:
+                cmd.append("-f")
+            cmd.append(container_id)
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=12)
+            success = proc.returncode == 0
+            return {
+                "success": success,
+                "container_id": container_id,
+                "message": f"Container {container_id} deleted." if success else proc.stderr.strip()
+            }
+        except Exception as e:
+            return {"success": False, "container_id": container_id, "message": str(e)}
+
+    def delete_image(self, image_id: str, force: bool = True) -> Dict[str, Any]:
+        """Deletes a Docker image."""
+        try:
+            cmd = ["docker", "rmi"]
+            if force:
+                cmd.append("-f")
+            cmd.append(image_id)
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+            success = proc.returncode == 0
+            return {
+                "success": success,
+                "image_id": image_id,
+                "message": f"Image {image_id} deleted." if success else proc.stderr.strip()
+            }
+        except Exception as e:
+            return {"success": False, "image_id": image_id, "message": str(e)}
+
     def prune_images(self) -> Dict[str, Any]:
         """Prunes unused/dangling images to free disk space."""
         try:
@@ -287,3 +324,4 @@ class DockerService:
         return {"success": False, "message": "Docker Desktop executable not found."}
 
 docker_service = DockerService()
+

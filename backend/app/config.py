@@ -33,4 +33,17 @@ class Settings:
     MAX_AUTO_ACTIONS_PER_HOUR: int = int(os.getenv("MAX_AUTO_ACTIONS_PER_HOUR", "3"))
     AUDIT_LOG_PATH: str = os.getenv("AUDIT_LOG_PATH", str(ROOT_DIR / "logs" / "remediation_audit.log"))
 
+    # Remote Linux Server Settings
+    LINUX_SERVER_HOST: str = os.getenv("LINUX_SERVER_HOST", "172.16.10.29")
+    LINUX_SERVER_PORT: int = int(os.getenv("LINUX_SERVER_PORT", "22"))
+    LINUX_SERVER_USER: str = os.getenv("LINUX_SERVER_USER", "administrator")
+    LINUX_SERVER_PASSWORD: str = os.getenv("LINUX_SERVER_PASSWORD", "")
+
+    # Remote Windows Server Settings
+    WINDOWS_SERVER_HOST: str = os.getenv("WINDOWS_SERVER_HOST", "172.16.10.30")
+    WINDOWS_SERVER_PORT: int = int(os.getenv("WINDOWS_SERVER_PORT", "5985"))
+    WINDOWS_SERVER_USER: str = os.getenv("WINDOWS_SERVER_USER", "administrator")
+    WINDOWS_SERVER_PASSWORD: str = os.getenv("WINDOWS_SERVER_PASSWORD", "")
+
+
 settings = Settings()

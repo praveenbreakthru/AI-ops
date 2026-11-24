@@ -5,11 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from app.config import settings
-from app.database.session import init_db
-from app.api import system, alerts, ai, remediation, reports, apps
+from app.database.session import init_db, SessionLocal
+from app.api import system, alerts, ai, remediation, reports, apps, auth, uptime, terminal, database
 from app.services.native_collector import native_collector
 from app.services.eventlog_service import eventlog_service
 from app.services.metrics_store import metrics_store
+from app.services.discovery_service import discovery_service
+from app.services.auth_service import auth_service
 from app.ai.auto_heal_engine import auto_heal_engine
 
 logging.basicConfig(
@@ -47,13 +49,25 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Pure Full-Stack Windows AIOps Backend...")
     init_db()
 
+    # Seed default administrator account (admin / admin@123)
+    try:
+        with SessionLocal() as db:
+            auth_service.seed_default_admin(db)
+    except Exception as e:
+        logger.error(f"Admin seeding error: {e}")
+
     # Initial sample pass
     scheduled_metric_collection()
     scheduled_eventlog_sync()
+    try:
+        discovery_service.scan_for_new_items()
+    except Exception as e:
+        logger.debug(f"Initial discovery error: {e}")
 
     # Schedule periodic collection
     scheduler.add_job(scheduled_metric_collection, 'interval', seconds=3, id='native_metric_collection')
     scheduler.add_job(scheduled_eventlog_sync, 'interval', seconds=20, id='native_eventlog_sync')
+    scheduler.add_job(discovery_service.scan_for_new_items, 'interval', seconds=5, id='dynamic_auto_discovery')
     scheduler.add_job(auto_heal_engine.run_self_healing_cycle, 'interval', seconds=15, id='auto_heal_cycle')
     scheduler.add_job(scheduled_database_prune, 'interval', hours=6, id='metrics_prune')
     scheduler.start()
@@ -81,12 +95,16 @@ app.add_middleware(
 )
 
 # Register API Routers
+app.include_router(auth.router, prefix=settings.API_PREFIX)
 app.include_router(system.router, prefix=settings.API_PREFIX)
 app.include_router(alerts.router, prefix=settings.API_PREFIX)
 app.include_router(ai.router, prefix=settings.API_PREFIX)
 app.include_router(remediation.router, prefix=settings.API_PREFIX)
 app.include_router(reports.router, prefix=settings.API_PREFIX)
 app.include_router(apps.router, prefix=settings.API_PREFIX)
+app.include_router(uptime.router, prefix=settings.API_PREFIX)
+app.include_router(terminal.router, prefix=settings.API_PREFIX)
+app.include_router(database.router, prefix=settings.API_PREFIX)
 
 @app.get("/api/health")
 def health_check():

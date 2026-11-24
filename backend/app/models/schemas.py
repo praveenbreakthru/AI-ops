@@ -129,6 +129,7 @@ class PredictionOut(BaseModel):
 class AiDiagnosisRequest(BaseModel):
     incident_id: Optional[int] = None
     context_notes: Optional[str] = None
+    target: Optional[str] = "local"
 
 class AiDiagnosisResponse(BaseModel):
     incident_summary: str
@@ -156,4 +157,31 @@ class RemediationActionOut(BaseModel):
     command_executed: Optional[str]
     execution_result: Optional[str]
     created_at: datetime
+
+# ==============================================================================
+# Managed Node Schemas
+# ==============================================================================
+class NodeTestRequest(BaseModel):
+    host: str
+    port: Optional[int] = None
+    os_type: str = "linux"  # "linux" or "windows_server"
+    username: str
+    password: str
+
+class NodeAddRequest(BaseModel):
+    name: str
+    host: str
+    port: Optional[int] = None
+    os_type: str = "linux"
+    username: str
+    password: str
+
+class NodeUpdateRequest(BaseModel):
+    name: str
+    host: str
+    port: Optional[int] = None
+    username: str
+    password: Optional[str] = None
+
+
 

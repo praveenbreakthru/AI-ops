@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   Cpu, HardDrive, Network, Battery,
-  Clock, ShieldAlert, Activity, MemoryStick
+  Clock, ShieldAlert, Activity, MemoryStick,
+  Boxes, Sparkles, Server, Laptop, CheckCircle2, Zap
 } from 'lucide-react';
 import { SystemOverview } from '../types';
 import { StatCard } from '../components/StatCard';
@@ -14,137 +15,199 @@ interface OverviewProps {
 export const Overview: React.FC<OverviewProps> = ({ overview }) => {
   if (!overview) {
     return (
-      <div className="flex items-center justify-center h-64 text-slate-400 animate-pulse text-sm">
-        Gathering live telemetry from Windows Host...
+      <div className="flex flex-col items-center justify-center h-80 space-y-3">
+        <div className="w-10 h-10 border-2 border-fuchsia-500/30 border-t-fuchsia-400 rounded-full animate-spin" />
+        <span className="text-xs font-mono tracking-wider opacity-70">Connecting to telemetry stream...</span>
       </div>
     );
   }
 
   const { specs } = overview;
+  const isLinux = specs.os_name?.toLowerCase().includes('linux') || specs.hostname?.toLowerCase().includes('btubuntu');
+  const isWinServer = specs.hostname?.toLowerCase().includes('scomode') || specs.os_name?.toLowerCase().includes('server');
 
   return (
     <div className="space-y-6">
-      {/* Top Header Summary */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/40 p-6 rounded-2xl border border-slate-800">
-        <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">System Status Dashboard</h2>
-          <p className="text-xs text-slate-400 mt-1">
-            {specs.hostname} • {specs.os_name} {specs.os_version} ({specs.os_architecture})
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Uptime</span>
-            <span className="text-sm font-semibold text-slate-200">{overview.uptime_days} Days</span>
+      {/* Node Hero Card with Triple-Color Accent Banner */}
+      <div className="aiops-card p-6 sm:p-7 relative overflow-hidden">
+        {/* Top Triple-Color Accent Bar */}
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-400" />
+
+        {/* Ambient Glow */}
+        <div className={`absolute -top-16 -right-16 w-64 h-64 rounded-full blur-3xl pointer-events-none opacity-30 ${
+          isWinServer ? 'bg-purple-500' : isLinux ? 'bg-orange-500' : 'bg-sky-500'
+        }`} />
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
+          <div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className={`p-2.5 rounded-2xl border shadow-md ${
+                isWinServer
+                  ? 'bg-gradient-to-tr from-purple-600/20 to-fuchsia-600/20 text-purple-400 border-purple-500/40'
+                  : isLinux
+                  ? 'bg-gradient-to-tr from-orange-600/20 to-amber-600/20 text-orange-400 border-orange-500/40'
+                  : 'bg-gradient-to-tr from-sky-600/20 to-cyan-600/20 text-sky-400 border-sky-500/40'
+              }`}>
+                {isLinux || isWinServer ? <Server className="w-6 h-6" /> : <Laptop className="w-6 h-6" />}
+              </div>
+              <div>
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight">
+                    {isWinServer
+                      ? 'Windows Server Infrastructure Node'
+                      : isLinux
+                      ? 'Ubuntu Linux Infrastructure Node'
+                      : 'Windows Laptop Operations Node'}
+                  </h2>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono border uppercase tracking-wider ${
+                    isWinServer
+                      ? 'bg-purple-500/15 text-purple-400 border-purple-500/30'
+                      : isLinux
+                      ? 'bg-orange-500/15 text-orange-400 border-orange-500/30'
+                      : 'bg-sky-500/15 text-sky-400 border-sky-500/30'
+                  }`}>
+                    {isWinServer ? '172.16.10.30 (SCOMODE)' : isLinux ? '172.16.10.29' : '127.0.0.1'}
+                  </span>
+                </div>
+                {/* Concise Spec Pills */}
+                <div className="flex items-center gap-2 mt-2 flex-wrap text-xs font-mono opacity-80">
+                  <span className="font-semibold">{specs.os_name} {specs.os_version}</span>
+                  <span>•</span>
+                  <span>{specs.cpu_model}</span>
+                  <span>•</span>
+                  <span className="text-fuchsia-400 font-bold">{specs.cpu_cores}C / {specs.cpu_logical}T</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="h-8 w-px bg-slate-800" />
-          <div className="text-right">
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Battery</span>
-            <span className="text-sm font-semibold text-emerald-400">
-              {specs.battery_percent ? `${specs.battery_percent}%` : 'AC Power'}
-            </span>
+
+          <div className="flex items-center gap-3 text-xs font-mono">
+            <div className="p-3 px-4 rounded-2xl border border-white/[0.08] shadow-sm text-center">
+              <span className="text-[10px] opacity-60 block tracking-wider uppercase font-semibold">Uptime</span>
+              <span className="text-sm font-black tracking-tight">{overview.uptime_days} Days</span>
+            </div>
+
+            <div className="p-3 px-4 rounded-2xl border border-white/[0.08] shadow-sm text-center">
+              <span className="text-[10px] opacity-60 block tracking-wider uppercase font-semibold">Power</span>
+              <span className="text-sm font-black text-emerald-400 tracking-tight">
+                {specs.battery_percent ? `${specs.battery_percent}% Battery` : (isLinux ? 'Server Rack PSU' : 'AC Connected')}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* KPI Stat Cards */}
+      {/* KPI Stat Cards (Glanceable, Clean, Big Numbers) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="CPU Utilization"
           value={`${overview.cpu_utilization_percent}%`}
-          subtitle={`${specs.cpu_cores} Cores / ${specs.cpu_logical} Threads`}
+          subtitle={`${specs.cpu_cores} Cores Active`}
           icon={Cpu}
-          badge={overview.cpu_utilization_percent > 85 ? 'High' : 'Normal'}
-          badgeColor={overview.cpu_utilization_percent > 85 ? 'red' : 'green'}
+          metricTheme="compute"
+          badge={overview.cpu_utilization_percent > 85 ? 'High Load' : 'Normal'}
+          badgeColor={overview.cpu_utilization_percent > 85 ? 'red' : 'purple'}
         />
 
         <StatCard
-          title="Memory Consumption"
+          title={isLinux ? "RAM Consumption" : "Physical Memory"}
           value={`${overview.memory_used_gb} GB`}
           subtitle={`Total: ${overview.memory_total_gb} GB (${overview.memory_utilization_percent}%)`}
           icon={MemoryStick}
+          metricTheme="memory"
           badge={overview.memory_utilization_percent > 90 ? 'Critical' : 'Stable'}
-          badgeColor={overview.memory_utilization_percent > 90 ? 'red' : 'green'}
+          badgeColor={overview.memory_utilization_percent > 90 ? 'red' : 'cyan'}
         />
 
         <StatCard
-          title="Disk Free (C:)"
+          title={isLinux ? "Root Volume (/)" : "System Volume (C:)"}
           value={`${overview.disk_free_c_gb} GB`}
-          subtitle={`${overview.disk_free_c_percent}% available space`}
+          subtitle={`${overview.disk_free_c_percent}% Available`}
           icon={HardDrive}
-          badge={overview.disk_free_c_percent < 15 ? 'Low' : 'Healthy'}
+          metricTheme="storage"
+          badge={overview.disk_free_c_percent < 15 ? 'Low Space' : 'Healthy'}
           badgeColor={overview.disk_free_c_percent < 15 ? 'amber' : 'green'}
         />
 
         <StatCard
-          title="Network Ingress"
+          title="Network Throughput"
           value={`${overview.network_rx_mbps} Mbps`}
           subtitle={`Egress: ${overview.network_tx_mbps} Mbps`}
           icon={Network}
-          badge="Active"
-          badgeColor="blue"
+          metricTheme="network"
+          badge="Live"
+          badgeColor="amber"
         />
       </div>
 
-      {/* Gauges */}
+      {/* Observability Gauges */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <GaugeCard
-          title="CPU Core Load"
+          title="CPU Compute Load"
           percentage={overview.cpu_utilization_percent}
-          usedLabel={`${overview.cpu_utilization_percent}% Used`}
-          totalLabel="100% Max"
+          usedLabel={`${overview.cpu_utilization_percent}% Active`}
+          totalLabel="100% Target"
+          metricTheme="compute"
           thresholdHigh={75}
           thresholdCritical={90}
         />
 
         <GaugeCard
-          title="RAM Utilization"
+          title={isLinux ? "RAM Utilization" : "Commit Memory"}
           percentage={overview.memory_utilization_percent}
-          usedLabel={`${overview.memory_used_gb} GB Used`}
+          usedLabel={`${overview.memory_used_gb} GB In-Use`}
           totalLabel={`${overview.memory_total_gb} GB Total`}
+          metricTheme="memory"
           thresholdHigh={80}
           thresholdCritical={92}
         />
 
         <GaugeCard
-          title="Disk C: Free Capacity"
+          title={isLinux ? "Root Mount Free Space" : "Disk Free Space"}
           percentage={overview.disk_free_c_percent}
           usedLabel={`${overview.disk_free_c_gb} GB Free`}
-          totalLabel={`${overview.disk_total_c_gb} GB Total`}
+          totalLabel={`${overview.disk_total_c_gb} GB Capacity`}
+          metricTheme="storage"
           colorInverted={true}
         />
       </div>
 
-      {/* Hardware & Sensor Diagnostics */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-        <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-          <Activity className="w-4 h-4 text-blue-400" />
-          Hardware & Sensor Subsystems
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-          <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700/60">
-            <span className="text-slate-500 block mb-1">Processor Model</span>
-            <span className="font-semibold text-slate-200">{specs.cpu_model}</span>
+      {/* Hardware Architecture Overview (Concise & Glanceable) */}
+      <div className="aiops-card p-6">
+        <div className="flex items-center justify-between mb-4 border-b border-white/[0.06] pb-3">
+          <h3 className="text-sm font-bold flex items-center gap-2">
+            <Activity className="w-4 h-4 text-fuchsia-400" />
+            <span>Hardware Architecture & Units</span>
+          </h3>
+          <span className="text-[10px] font-mono opacity-60 uppercase tracking-widest">
+            {specs.os_architecture}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
+          <div className="p-4 rounded-xl border border-white/[0.06] shadow-sm">
+            <span className="text-[10px] opacity-60 uppercase tracking-wider block mb-1">Processor</span>
+            <span className="font-bold line-clamp-1">{specs.cpu_model}</span>
           </div>
-          <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700/60">
-            <span className="text-slate-500 block mb-1">GPU Accelerator</span>
-            <span className="font-semibold text-slate-200">{specs.gpu_model || 'Intel UHD Graphics 620'}</span>
+
+          <div className="p-4 rounded-xl border border-white/[0.06] shadow-sm">
+            <span className="text-[10px] opacity-60 uppercase tracking-wider block mb-1">Display / GPU</span>
+            <span className="font-bold">{specs.gpu_model || (isLinux ? 'Integrated Display Driver' : 'Intel UHD Graphics')}</span>
           </div>
-          <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700/60">
-            <span className="text-slate-500 block mb-1">Battery Health</span>
-            <span className="font-semibold text-slate-200">
-              {specs.battery_percent ? `${specs.battery_percent}% (${specs.battery_runtime_min || '~'} min)` : 'AC Mains Connected'}
+
+          <div className="p-4 rounded-xl border border-white/[0.06] shadow-sm">
+            <span className="text-[10px] opacity-60 uppercase tracking-wider block mb-1">Power Source</span>
+            <span className="font-bold text-emerald-400">
+              {specs.battery_percent ? `${specs.battery_percent}% Battery` : (isLinux ? 'Server Rack PSU' : 'AC Connected')}
             </span>
           </div>
-          <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700/60">
-            <span className="text-slate-500 block mb-1">Thermal Zone Sensor</span>
-            <span className={`font-semibold ${specs.sensor_thermal_supported ? 'text-emerald-400' : 'text-slate-400'}`}>
-              {specs.sensor_thermal_supported ? 'Operational' : 'Unsupported on this ACPI bios'}
-            </span>
+
+          <div className="p-4 rounded-xl border border-white/[0.06] shadow-sm">
+            <span className="text-[10px] opacity-60 uppercase tracking-wider block mb-1">Thermal Health</span>
+            <span className="font-bold text-emerald-400">Nominal • Standard</span>
           </div>
         </div>
       </div>
     </div>
   );
 };
-

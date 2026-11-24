@@ -98,4 +98,30 @@ class EventLogRecord(Base):
     message = Column(Text, nullable=True)
     timestamp = Column(DateTime(timezone=True), default=utc_now)
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(64), unique=True, index=True, nullable=False)
+    email = Column(String(128), unique=True, index=True, nullable=False)
+    password_hash = Column(String(256), nullable=False)
+    role = Column(String(32), default="admin")
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+
+class ManagedNode(Base):
+    __tablename__ = "managed_nodes"
+
+    id = Column(String(64), primary_key=True, index=True)
+    name = Column(String(128), nullable=False)
+    os_type = Column(String(32), nullable=False)  # "linux" or "windows_server"
+    host = Column(String(128), nullable=False)
+    port = Column(Integer, nullable=False, default=22)
+    username = Column(String(128), nullable=False)
+    password = Column(String(256), nullable=False)
+    is_custom = Column(Boolean, default=True)
+    status = Column(String(32), default="online")
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+
+
+
 

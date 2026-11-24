@@ -130,6 +130,21 @@ class KubernetesService:
         except Exception as e:
             return {"success": False, "message": str(e)}
 
+    def delete_pod(self, pod_name: str, namespace: str = "default", force: bool = True) -> Dict[str, Any]:
+        """Deletes a pod completely."""
+        try:
+            cmd = ["kubectl", "delete", "pod", pod_name, "-n", namespace]
+            if force:
+                cmd.extend(["--grace-period=0", "--force"])
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+            success = proc.returncode == 0
+            return {
+                "success": success,
+                "message": f"Pod {pod_name} deleted." if success else proc.stderr.strip()
+            }
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
     def restart_deployment(self, deployment_name: str, namespace: str = "default") -> Dict[str, Any]:
         """Triggers a zero-downtime rolling restart of a deployment."""
         try:
@@ -148,3 +163,4 @@ class KubernetesService:
             return {"success": False, "message": str(e)}
 
 k8s_service = KubernetesService()
+

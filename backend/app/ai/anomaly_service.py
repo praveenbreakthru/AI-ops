@@ -13,14 +13,14 @@ class AnomalyDetectionService:
     def __init__(self):
         self.model = IsolationForest(contamination=0.05, random_state=42)
 
-    def detect_metric_anomalies(self) -> List[AnomalyOut]:
+    def detect_metric_anomalies(self, target: str = "local") -> List[AnomalyOut]:
         """
-        Runs statistical and ML anomaly detection on core Windows metrics:
-        - CPU Utilization
-        - Memory Utilization
-        - Disk I/O Throughput
-        - Network Bandwidth
+        Runs statistical and ML anomaly detection on core metrics.
+        Supports both local Windows host and remote Linux server.
         """
+        if target == "linux":
+            return self.detect_linux_anomalies()
+
         anomalies = []
 
         # 1. CPU Utilization (evaluate last 30 minutes)
@@ -86,5 +86,77 @@ class AnomalyDetectionService:
                 timestamp=datetime.now(timezone.utc)
             )
         return None
+
+    def detect_linux_anomalies(self) -> List[AnomalyOut]:
+        """Detects live anomalies, crash loops, and resource saturation on remote Linux server."""
+        from app.services.linux_service import linux_service
+        anomalies = []
+        now = datetime.now(timezone.utc)
+
+        # 1. Check crashing Docker containers
+        try:
+            containers = linux_service.get_docker_containers()
+            for c in containers:
+                if c.get("is_crashed") or "restarting" in c.get("status", "").lower():
+                    anomalies.append(AnomalyOut(
+                        metric_name=f"Docker Container Failure ({c.get('name')})",
+                        current_value=1.0,
+                        baseline_mean=0.0,
+                        z_score=3.8,
+                        is_anomaly=True,
+                        severity="critical",
+                        explanation=f"Container '{c.get('name')}' is in continuous crashing/restarting state on Linux server: {c.get('status')}.",
+                        timestamp=now
+                    ))
+        except Exception:
+            pass
+
+        # 2. Check crashing k8s pods
+        try:
+            pods = linux_service.get_k8s_pods()
+            for p in pods:
+                if p.get("is_crashing"):
+                    anomalies.append(AnomalyOut(
+                        metric_name=f"Kubernetes Pod Failure ({p.get('name')})",
+                        current_value=float(p.get("restarts", 1)),
+                        baseline_mean=0.0,
+                        z_score=3.5,
+                        is_anomaly=True,
+                        severity="critical",
+                        explanation=f"Pod '{p.get('name')}' in namespace '{p.get('namespace')}' failed with {p.get('status')} ({p.get('restarts')} restarts).",
+                        timestamp=now
+                    ))
+        except Exception:
+            pass
+
+        # 3. Check memory & CPU
+        try:
+            overview = linux_service.get_overview()
+            if overview.memory_utilization_percent > 85.0:
+                anomalies.append(AnomalyOut(
+                    metric_name="Linux Server Memory Load",
+                    current_value=overview.memory_utilization_percent,
+                    baseline_mean=55.0,
+                    z_score=2.8,
+                    is_anomaly=True,
+                    severity="warning" if overview.memory_utilization_percent < 92.0 else "critical",
+                    explanation=f"Remote Linux memory utilization is high at {overview.memory_utilization_percent}% ({overview.memory_used_gb} GB used of {overview.memory_total_gb} GB).",
+                    timestamp=now
+                ))
+            if overview.cpu_utilization_percent > 80.0:
+                anomalies.append(AnomalyOut(
+                    metric_name="Linux Server CPU Saturation",
+                    current_value=overview.cpu_utilization_percent,
+                    baseline_mean=20.0,
+                    z_score=3.1,
+                    is_anomaly=True,
+                    severity="warning",
+                    explanation=f"Remote Linux CPU utilization reached {overview.cpu_utilization_percent}%.",
+                    timestamp=now
+                ))
+        except Exception:
+            pass
+
+        return anomalies
 
 anomaly_service = AnomalyDetectionService()

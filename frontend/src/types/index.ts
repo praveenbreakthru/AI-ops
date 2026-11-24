@@ -143,6 +143,7 @@ export interface DockerContainer {
   exit_code: number;
   ports: string;
   is_crashed: boolean;
+  is_new?: boolean;
 }
 
 export interface DockerImage {
@@ -174,14 +175,26 @@ export interface K8sPod {
   ip: string;
   created_at: string;
   is_crashing: boolean;
+  is_new?: boolean;
 }
 
 export interface AppEcosystem {
+  id?: string;
   name: string;
+  category?: string;
+  description?: string;
   process_count: number;
   cpu_percent: number;
   memory_mb: number;
-  status: string;
+  status: 'running' | 'stopped' | string;
+  executable_path?: string;
+  service_name?: string;
+  target?: string;
+  node_name?: string;
+  pids?: number[];
+  actions?: string[];
+  is_new?: boolean;
+  is_downloaded?: boolean;
 }
 
 export interface AutoHealAction {

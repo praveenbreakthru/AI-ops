@@ -129,3 +129,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\health-check.ps1
 | **AIOps React UI** | [http://localhost:5173](http://localhost:5173) | Main Operations Center (14 Views) |
 | **FastAPI Swagger API** | [http://localhost:8000/docs](http://localhost:8000/docs) | Interactive Backend API Explorer |
 | **Health Check API** | [http://localhost:8000/api/health](http://localhost:8000/api/health) | Subsystem Health Status JSON |
+
+
+
+http://172.16.13.14:5173
