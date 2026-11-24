@@ -8,7 +8,16 @@ load_dotenv(dotenv_path=env_path)
 
 data_dir = ROOT_DIR / "data"
 data_dir.mkdir(parents=True, exist_ok=True)
-sqlite_file = data_dir / "aiops_local.db"
+sqlite_file = (data_dir / "aiops_local.db").resolve()
+
+logs_dir = ROOT_DIR / "logs"
+logs_dir.mkdir(parents=True, exist_ok=True)
+
+raw_db_url = os.getenv("DATABASE_URL", "")
+if not raw_db_url or "./data" in raw_db_url:
+    resolved_db_url = f"sqlite:///{sqlite_file.as_posix()}"
+else:
+    resolved_db_url = raw_db_url
 
 class Settings:
     PROJECT_NAME: str = "Windows AIOps Monitoring & Intelligence Platform"
@@ -22,7 +31,7 @@ class Settings:
     ALLOY_URL: str = os.getenv("ALLOY_URL", "http://localhost:12345")
 
     # Primary SQLite Database for pure full-stack lightweight deployment
-    DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{sqlite_file.as_posix()}")
+    DATABASE_URL: str = resolved_db_url
     SQLITE_URL: str = f"sqlite:///{sqlite_file.as_posix()}"
 
     OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
@@ -31,7 +40,7 @@ class Settings:
 
     REMEDIATION_MODE: str = os.getenv("REMEDIATION_MODE", "manual_approval")
     MAX_AUTO_ACTIONS_PER_HOUR: int = int(os.getenv("MAX_AUTO_ACTIONS_PER_HOUR", "3"))
-    AUDIT_LOG_PATH: str = os.getenv("AUDIT_LOG_PATH", str(ROOT_DIR / "logs" / "remediation_audit.log"))
+    AUDIT_LOG_PATH: str = os.getenv("AUDIT_LOG_PATH", str(logs_dir / "remediation_audit.log"))
 
     # Remote Linux Server Settings
     LINUX_SERVER_HOST: str = os.getenv("LINUX_SERVER_HOST", "172.16.10.29")

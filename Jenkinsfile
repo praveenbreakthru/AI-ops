@@ -20,6 +20,7 @@ pipeline {
                 echo 'Preparing runtime storage directories and environment config...'
                 sh '''
                     mkdir -p data logs
+                    chmod -R 777 data logs
                     if [ ! -f .env ]; then
                         echo "Warning: .env not found, initializing from .env.example"
                         cp .env.example .env
