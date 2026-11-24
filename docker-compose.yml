@@ -6,7 +6,7 @@ services:
     container_name: aiops-backend
     restart: unless-stopped
     ports:
-      - "${BACKEND_PORT:-8001}:8000"
+      - "${BACKEND_PORT:-5666}:8000"
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs

@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         COMPOSE_PROJECT_NAME = 'aiops'
-        BACKEND_PORT = '8001'
+        BACKEND_PORT = '5666'
         FRONTEND_PORT = '5173'
     }
 
