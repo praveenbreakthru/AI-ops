@@ -56,18 +56,10 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Admin seeding error: {e}")
 
-    # Initial sample pass
-    scheduled_metric_collection()
-    scheduled_eventlog_sync()
-    try:
-        discovery_service.scan_for_new_items()
-    except Exception as e:
-        logger.debug(f"Initial discovery error: {e}")
-
-    # Schedule periodic collection
+    # Start scheduler for background collection without blocking startup
     scheduler.add_job(scheduled_metric_collection, 'interval', seconds=3, id='native_metric_collection')
     scheduler.add_job(scheduled_eventlog_sync, 'interval', seconds=20, id='native_eventlog_sync')
-    scheduler.add_job(discovery_service.scan_for_new_items, 'interval', seconds=5, id='dynamic_auto_discovery')
+    scheduler.add_job(discovery_service.scan_for_new_items, 'interval', seconds=15, id='dynamic_auto_discovery')
     scheduler.add_job(auto_heal_engine.run_self_healing_cycle, 'interval', seconds=15, id='auto_heal_cycle')
     scheduler.add_job(scheduled_database_prune, 'interval', hours=6, id='metrics_prune')
     scheduler.start()

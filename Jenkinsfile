@@ -47,15 +47,24 @@ pipeline {
             steps {
                 echo 'Waiting for services to initialize and verifying health...'
                 sh '''
-                    # Allow 8 seconds for Uvicorn & Nginx to warm up
-                    sleep 8
+                    echo "Checking Backend API Health (with retry loop)..."
+                    SUCCESS=0
+                    for i in $(seq 1 15); do
+                        if curl -s -f http://127.0.0.1:${BACKEND_PORT}/api/health; then
+                            echo ""
+                            echo "SUCCESS: Backend is healthy on attempt $i!"
+                            SUCCESS=1
+                            break
+                        fi
+                        echo "Waiting for Backend to initialize ($i/15)..."
+                        sleep 3
+                    done
 
-                    echo "Testing Backend API Health..."
-                    curl -s -f http://127.0.0.1:${BACKEND_PORT}/api/health || {
-                        echo "ERROR: Backend health endpoint failed!"
-                        docker compose logs backend --tail=30
+                    if [ $SUCCESS -ne 1 ]; then
+                        echo "ERROR: Backend health endpoint failed after 45 seconds!"
+                        docker compose logs backend --tail=50
                         exit 1
-                    }
+                    fi
 
                     echo "Testing Frontend HTTP Response..."
                     curl -s -f http://127.0.0.1:${FRONTEND_PORT} > /dev/null || {
